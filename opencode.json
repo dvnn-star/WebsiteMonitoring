@@ -1,6 +1,10 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    "opencode-9router-plugin"
-  ]
+  "mcp": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp",
+      "enabled":true
+    }
+  }
 }
