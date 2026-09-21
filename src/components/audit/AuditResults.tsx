@@ -6,6 +6,8 @@ import { AuditResult, AuditStatus } from '@/types'
 import { AuditProgress } from '@/components/audit/AuditProgress'
 import { AuditSummary } from '@/components/audit/AuditSummary'
 import { CategoryCard } from '@/components/audit/CategoryCard'
+import { IssueDetail } from '@/components/audit/IssueDetail'
+import { RotateCw, Loader2 } from 'lucide-react'
 
 const categoryOrder = ['technical', 'seo', 'crawlability', 'performance', 'security', 'infrastructure']
 
@@ -35,6 +37,7 @@ export function AuditResults({
   const [status, setStatus] = useState<AuditStatus>(initialStatus as AuditStatus)
   const [results, setResults] = useState<AuditResult[]>(initialResults)
   const [isRerunning, setIsRerunning] = useState(false)
+  const [selectedResult, setSelectedResult] = useState<AuditResult | null>(null)
 
   const handleRerunAudit = async () => {
     setIsRerunning(true)
@@ -77,7 +80,7 @@ export function AuditResults({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <AuditSummary
           audit={{
             id: auditId,
@@ -92,13 +95,26 @@ export function AuditResults({
         />
       </div>
 
-      <div className="flex justify-end mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-xs text-slate-500">
+          Click on any check to view technical details and optimization recommendations.
+        </p>
         <button
           onClick={handleRerunAudit}
           disabled={isRerunning}
-          className="bg-accent text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-blue-700 shadow-sm transition-all disabled:opacity-50 shrink-0"
         >
-          {isRerunning ? 'Starting...' : 'Run Audit Again'}
+          {isRerunning ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Starting...</span>
+            </>
+          ) : (
+            <>
+              <RotateCw className="w-3.5 h-3.5" />
+              <span>Run Audit Again</span>
+            </>
+          )}
         </button>
       </div>
 
@@ -109,10 +125,15 @@ export function AuditResults({
               key={category}
               title={categoryTitles[category]}
               results={groupedResults[category].map(r => ({ ...r, id: r.id || `${r.check_type}-${r.category}` }))}
+              onSelectResult={(result) => setSelectedResult(result)}
             />
           )
         ))}
       </div>
+
+      {selectedResult && (
+        <IssueDetail result={selectedResult} onClose={() => setSelectedResult(null)} />
+      )}
     </div>
   )
 }

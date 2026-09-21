@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { AlertCircle, Plus } from 'lucide-react'
 
 export function AddWebsiteForm() {
   const router = useRouter()
@@ -51,10 +52,10 @@ export function AddWebsiteForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="url" className="block text-sm font-medium text-text-primary mb-1">
-          Website URL
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="space-y-1.5">
+        <label htmlFor="url" className="block text-sm font-semibold text-slate-800">
+          Website URL <span className="text-rose-500">*</span>
         </label>
         <input
           type="text"
@@ -64,12 +65,13 @@ export function AddWebsiteForm() {
           placeholder="https://example.com"
           required
           disabled={loading}
-          className="w-full px-3 py-2 border border-border-medium rounded-md text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:bg-bg-secondary disabled:cursor-not-allowed"
+          className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 disabled:bg-slate-50 disabled:cursor-not-allowed"
         />
+        <p className="text-xs text-slate-500">The public web address to monitor and audit.</p>
       </div>
 
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-text-primary mb-1">
+      <div className="space-y-1.5">
+        <label htmlFor="name" className="block text-sm font-semibold text-slate-800">
           Website Name (optional)
         </label>
         <input
@@ -79,31 +81,34 @@ export function AddWebsiteForm() {
           onChange={(e) => setName(e.target.value)}
           placeholder="My Portfolio"
           disabled={loading}
-          className="w-full px-3 py-2 border border-border-medium rounded-md text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:bg-bg-secondary disabled:cursor-not-allowed"
+          className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 disabled:bg-slate-50 disabled:cursor-not-allowed"
         />
+        <p className="text-xs text-slate-500">A friendly nickname for your dashboard.</p>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-status-error text-status-error text-sm rounded-md">
-          {error}
+        <div className="flex items-center gap-2 p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium rounded-lg">
+          <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
-      <div className="flex gap-3">
+      <div className="flex items-center gap-3 pt-2">
         <button
           type="button"
           onClick={() => router.back()}
           disabled={loading}
-          className="flex-1 px-4 py-2 border border-border-light rounded-md text-text-primary hover:bg-bg-secondary disabled:opacity-50"
+          className="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors disabled:opacity-50"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-accent text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+          className="flex-1 inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 shadow-sm transition-all disabled:opacity-50"
         >
-          {loading ? 'Adding...' : 'Add Website'}
+          <Plus className="w-4 h-4" />
+          <span>{loading ? 'Adding...' : 'Add Website'}</span>
         </button>
       </div>
     </form>

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { Trash2 } from 'lucide-react'
 
 export function DeleteWebsiteButton({ websiteId }: { websiteId: string }) {
   const router = useRouter()
@@ -32,9 +33,11 @@ export function DeleteWebsiteButton({ websiteId }: { websiteId: string }) {
     <button
       onClick={handleDelete}
       disabled={deleting}
-      className="text-status-error hover:text-red-700 text-sm px-2 py-1 disabled:opacity-50"
+      className="inline-flex items-center gap-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-lg text-xs px-2.5 py-2 font-medium transition-colors disabled:opacity-50"
+      title="Delete Website"
     >
-      {deleting ? 'Deleting...' : 'Delete'}
+      <Trash2 className="w-3.5 h-3.5" />
+      <span>{deleting ? 'Deleting...' : 'Delete'}</span>
     </button>
   )
 }

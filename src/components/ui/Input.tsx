@@ -8,6 +8,7 @@ export function Input({
   error,
   required = false,
   disabled = false,
+  className = '',
 }: {
   label?: string
   type?: string
@@ -18,11 +19,12 @@ export function Input({
   error?: string
   required?: boolean
   disabled?: boolean
+  className?: string
 }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       {label && (
-        <label htmlFor={name} className="block text-sm font-medium text-text-primary">
+        <label htmlFor={name} className="block text-sm font-medium text-slate-700">
           {label}
           {required && <span className="text-status-error ml-1">*</span>}
         </label>
@@ -36,12 +38,12 @@ export function Input({
         placeholder={placeholder}
         disabled={disabled}
         required={required}
-        className={`w-full px-3 py-2 border rounded-md text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:bg-bg-secondary disabled:cursor-not-allowed ${
-          error ? 'border-status-error' : 'border-border-medium'
-        }`}
+        className={`w-full px-3.5 py-2.5 bg-white border rounded-lg text-sm text-text-primary placeholder:text-slate-400 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed ${
+          error ? 'border-status-error focus:ring-rose-500/20 focus:border-rose-500' : 'border-slate-300'
+        } ${className}`}
       />
       {error && (
-        <p className="text-sm text-status-error">{error}</p>
+        <p className="text-xs font-medium text-status-error">{error}</p>
       )}
     </div>
   )
