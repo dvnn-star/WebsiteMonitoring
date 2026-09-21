@@ -7,6 +7,7 @@ import Swal from 'sweetalert2'
 import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { registerSchema, sanitizeInput } from '@/lib/validation/schemas'
 
 export function RegisterForm() {
   const router = useRouter()
@@ -25,13 +26,15 @@ export function RegisterForm() {
       return
     }
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
-    }
+    const parseResult = registerSchema.safeParse({
+      email: sanitizeInput(email.trim()),
+      password,
+      confirmPassword,
+    })
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters')
+    if (!parseResult.success) {
+      const firstError = Object.values(parseResult.error.flatten().fieldErrors)[0]?.[0]
+      setError(firstError || 'Validation failed')
       return
     }
 
@@ -39,8 +42,8 @@ export function RegisterForm() {
 
     try {
       const { error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: parseResult.data.email,
+        password: parseResult.data.password,
       })
 
       if (error) {
@@ -77,16 +80,21 @@ export function RegisterForm() {
         disabled={loading}
       />
       
-      <Input
-        label="Password"
-        type="password"
-        name="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Min. 6 characters"
-        required
-        disabled={loading}
-      />
+      <div className="space-y-1.5">
+        <Input
+          label="Password"
+          type="password"
+          name="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Min. 8 characters"
+          required
+          disabled={loading}
+        />
+        <p className="text-xs text-slate-500">
+          Must contain uppercase, lowercase, and number
+        </p>
+      </div>
 
       <Input
         label="Confirm Password"

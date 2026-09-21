@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { websiteIdSchema } from '@/lib/validation/schemas'
 
 export async function DELETE(
   request: Request,
@@ -13,11 +14,16 @@ export async function DELETE(
   }
 
   const { id } = await params
+  
+  const idValidation = websiteIdSchema.safeParse(id)
+  if (!idValidation.success) {
+    return NextResponse.json({ error: 'Invalid website ID format' }, { status: 400 })
+  }
 
   const { error } = await supabase
     .from('websites')
     .delete()
-    .eq('id', id)
+    .eq('id', idValidation.data)
     .eq('user_id', user.id)
 
   if (error) {
@@ -39,11 +45,16 @@ export async function GET(
   }
 
   const { id } = await params
+  
+  const idValidation = websiteIdSchema.safeParse(id)
+  if (!idValidation.success) {
+    return NextResponse.json({ error: 'Invalid website ID format' }, { status: 400 })
+  }
 
   const { data: website, error } = await supabase
     .from('websites')
-    .select('*')
-    .eq('id', id)
+    .select('id, url, domain, name, created_at, is_active, last_audit_at')
+    .eq('id', idValidation.data)
     .eq('user_id', user.id)
     .single()
 

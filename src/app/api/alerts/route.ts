@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { sanitizeInput } from '@/lib/validation/schemas'
 
 export async function GET() {
   const supabase = await createClient()
@@ -13,7 +14,7 @@ export async function GET() {
 
   const { data: alerts, error } = await supabase
     .from('alerts')
-    .select('*')
+    .select('id, type, message, is_read, created_at, website_id')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(20)
@@ -37,10 +38,20 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const body = await request.json()
-  const { alert_id, mark_all_read } = body
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+  }
 
-  if (mark_all_read) {
+  if (typeof body !== 'object' || body === null) {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+
+  const { alert_id, mark_all_read } = body as Record<string, unknown>
+
+  if (mark_all_read === true) {
     const { error } = await supabase
       .from('alerts')
       .update({ is_read: true })
@@ -53,11 +64,13 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ success: true })
   }
 
-  if (alert_id) {
+  if (alert_id && typeof alert_id === 'string') {
+    const sanitizedAlertId = sanitizeInput(alert_id)
+    
     const { error } = await supabase
       .from('alerts')
       .update({ is_read: true })
-      .eq('id', alert_id)
+      .eq('id', sanitizedAlertId)
       .eq('user_id', user.id)
 
     if (error) {

@@ -35,8 +35,8 @@ describe('RegisterForm', () => {
   it('shows error when passwords do not match', async () => {
     render(<RegisterForm />)
     fireEvent.change(screen.getByLabelText(/^email/i), { target: { value: 'a@b.com' } })
-    fireEvent.change(screen.getByLabelText(/^password/i), { target: { value: 'pass1234' } })
-    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'different' } })
+    fireEvent.change(screen.getByLabelText(/^password/i), { target: { value: 'Password123' } })
+    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'Different123' } })
     fireEvent.click(screen.getByRole('button', { name: /register/i }))
 
     await waitFor(() => {
@@ -48,12 +48,25 @@ describe('RegisterForm', () => {
   it('shows error when password is too short', async () => {
     render(<RegisterForm />)
     fireEvent.change(screen.getByLabelText(/^email/i), { target: { value: 'a@b.com' } })
-    fireEvent.change(screen.getByLabelText(/^password/i), { target: { value: '123' } })
-    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: '123' } })
+    fireEvent.change(screen.getByLabelText(/^password/i), { target: { value: 'Pass1' } })
+    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'Pass1' } })
     fireEvent.click(screen.getByRole('button', { name: /register/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/at least 6 characters/i)).toBeInTheDocument()
+      expect(screen.getByText(/at least 8 characters/i)).toBeInTheDocument()
+    })
+    expect(mockSignUp).not.toHaveBeenCalled()
+  })
+
+  it('shows error when password lacks complexity', async () => {
+    render(<RegisterForm />)
+    fireEvent.change(screen.getByLabelText(/^email/i), { target: { value: 'a@b.com' } })
+    fireEvent.change(screen.getByLabelText(/^password/i), { target: { value: 'password123' } })
+    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'password123' } })
+    fireEvent.click(screen.getByRole('button', { name: /register/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText(/uppercase letter, one lowercase letter, and one number/i)).toBeInTheDocument()
     })
     expect(mockSignUp).not.toHaveBeenCalled()
   })
@@ -63,8 +76,8 @@ describe('RegisterForm', () => {
 
     render(<RegisterForm />)
     fireEvent.change(screen.getByLabelText(/^email/i), { target: { value: 'a@b.com' } })
-    fireEvent.change(screen.getByLabelText(/^password/i), { target: { value: 'password123' } })
-    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'password123' } })
+    fireEvent.change(screen.getByLabelText(/^password/i), { target: { value: 'Password123' } })
+    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'Password123' } })
     fireEvent.click(screen.getByRole('button', { name: /register/i }))
 
     await waitFor(() => {
@@ -77,8 +90,8 @@ describe('RegisterForm', () => {
 
     render(<RegisterForm />)
     fireEvent.change(screen.getByLabelText(/^email/i), { target: { value: 'a@b.com' } })
-    fireEvent.change(screen.getByLabelText(/^password/i), { target: { value: 'password123' } })
-    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'password123' } })
+    fireEvent.change(screen.getByLabelText(/^password/i), { target: { value: 'Password123' } })
+    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'Password123' } })
     fireEvent.click(screen.getByRole('button', { name: /register/i }))
 
     await waitFor(() => {

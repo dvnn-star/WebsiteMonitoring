@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createWebsiteSchema, sanitizeInput } from '@/lib/validation/schemas'
 
 export function AddWebsiteForm() {
   const router = useRouter()
@@ -19,10 +20,14 @@ export function AddWebsiteForm() {
       normalizedUrl = 'https://' + normalizedUrl
     }
 
-    try {
-      new URL(normalizedUrl)
-    } catch {
-      setError('Please enter a valid URL')
+    const parseResult = createWebsiteSchema.safeParse({
+      url: normalizedUrl,
+      name: name.trim() || normalizedUrl,
+    })
+
+    if (!parseResult.success) {
+      const firstError = Object.values(parseResult.error.flatten().fieldErrors)[0]?.[0]
+      setError(firstError || 'Invalid input')
       return
     }
 
@@ -32,7 +37,10 @@ export function AddWebsiteForm() {
       const res = await fetch('/api/websites', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: normalizedUrl, name: name.trim() || undefined }),
+        body: JSON.stringify({
+          url: sanitizeInput(parseResult.data.url),
+          name: sanitizeInput(parseResult.data.name),
+        }),
       })
 
       const data = await res.json()
@@ -64,6 +72,7 @@ export function AddWebsiteForm() {
           placeholder="https://example.com"
           required
           disabled={loading}
+          maxLength={2048}
           className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 disabled:bg-slate-50 disabled:cursor-not-allowed"
         />
         <p className="text-xs text-slate-500">
@@ -82,6 +91,7 @@ export function AddWebsiteForm() {
           onChange={(e) => setName(e.target.value)}
           placeholder="My Company Portal"
           disabled={loading}
+          maxLength={100}
           className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 disabled:bg-slate-50 disabled:cursor-not-allowed"
         />
         <p className="text-xs text-slate-500">
