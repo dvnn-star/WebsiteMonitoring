@@ -5,8 +5,8 @@ export function validateAuditUrl(rawUrl: string): { valid: boolean; url?: string
   let url: URL
 
   try {
-    // Normalise: add https if missing scheme
-    const withScheme = rawUrl.startsWith('http://') || rawUrl.startsWith('https://')
+    // Only normalise if completely missing a scheme (no ://)
+    const withScheme = rawUrl.includes('://')
       ? rawUrl
       : `https://${rawUrl}`
     url = new URL(withScheme)

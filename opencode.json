@@ -5,6 +5,15 @@
       "type": "http",
       "url": "https://mcp.supabase.com/mcp",
       "enabled":true
+    },
+        "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "enabled": true,
+      "oauth": false,
+      "headers": {
+        "Authorization": "Bearer YOUR_GITHUB_PAT"
+      }
     }
   }
 }
