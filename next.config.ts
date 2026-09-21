@@ -3,6 +3,16 @@ import type { NextConfig } from 'next'
 const nextConfig: NextConfig = {
   serverExternalPackages: [],
 
+  async redirects() {
+    return [
+      {
+        source: '/websites/:path*',
+        destination: '/dashboard/websites/:path*',
+        permanent: true,
+      },
+    ]
+  },
+
   async headers() {
     return [
       {
