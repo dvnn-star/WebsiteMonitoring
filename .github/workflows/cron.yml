@@ -1,0 +1,32 @@
+name: Scheduled Uptime Monitor
+
+on:
+  schedule:
+    # Runs every 2 hours
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-uptime:
+    name: Run Uptime & Health Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Monitor Cron Endpoint
+        run: |
+          TARGET_URL="${{ secrets.NEXT_PUBLIC_SITE_URL || vars.NEXT_PUBLIC_SITE_URL || 'https://website-monitoring-chi.vercel.app' }}"
+          SECRET="${{ secrets.CRON_SECRET }}"
+          echo "Triggering uptime monitor at $TARGET_URL/api/cron/monitor"
+          
+          HTTP_STATUS=$(curl -s -o /tmp/response.json -w "%{http_code}" -X POST "$TARGET_URL/api/cron/monitor" \
+            -H "Authorization: Bearer $SECRET" \
+            -H "x-cron-secret: $SECRET" \
+            -H "Content-Type: application/json" || echo "000")
+            
+          echo "HTTP response status: $HTTP_STATUS"
+          cat /tmp/response.json || true
+          
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "Uptime checks executed successfully."
+          else
+            echo "Cron trigger returned status $HTTP_STATUS"
+          fi

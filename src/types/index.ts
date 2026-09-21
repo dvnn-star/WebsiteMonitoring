@@ -54,6 +54,30 @@ export interface AuditResult {
   created_at?: string
 }
 
+// Uptime Check Types
+export interface UptimeCheck {
+  id?: string
+  website_id: string
+  status_code: number | null
+  response_time_ms: number | null
+  is_up: boolean
+  error_message?: string | null
+  checked_at?: string
+}
+
+// Alert Types
+export interface Alert {
+  id: string
+  website_id: string
+  user_id: string
+  type: 'downtime' | 'recovery' | 'slow_response'
+  title: string
+  message: string
+  status_code?: number | null
+  is_read: boolean
+  created_at: string
+}
+
 // API Types
 export interface ApiResponse<T> {
   data?: T

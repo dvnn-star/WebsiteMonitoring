@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { WebsiteList } from '@/components/websites/WebsiteList'
 import { DashboardStats } from '@/components/dashboard/DashboardStats'
+import { AlertsBanner } from '@/components/dashboard/AlertsBanner'
 import { Plus, ChevronRight, Clock, ShieldAlert, CheckCircle2 } from 'lucide-react'
 
 export default async function DashboardPage() {
@@ -22,6 +23,14 @@ export default async function DashboardPage() {
     .from('audits')
     .select('id, status, created_at, pass_count, warning_count, error_count, website_id, websites(name, domain)')
     .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(5)
+
+  const { data: unreadAlerts } = await supabase
+    .from('alerts')
+    .select('*, websites(name, domain)')
+    .eq('user_id', user.id)
+    .eq('is_read', false)
     .order('created_at', { ascending: false })
     .limit(5)
 
@@ -52,6 +61,13 @@ export default async function DashboardPage() {
       </div>
 
       <DashboardStats stats={stats} />
+
+      {unreadAlerts && unreadAlerts.length > 0 && (
+        <div className="mt-6">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          <AlertsBanner initialAlerts={unreadAlerts as any} />
+        </div>
+      )}
 
       {/* Websites Grid */}
       <div className="mt-10">

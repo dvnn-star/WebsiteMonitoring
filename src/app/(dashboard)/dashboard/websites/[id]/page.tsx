@@ -4,7 +4,8 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { RunAuditButton } from '@/components/websites/RunAuditButton'
 import { AuditCharts } from '@/components/websites/AuditCharts'
-import { Audit } from '@/types'
+import { UptimeChart } from '@/components/websites/UptimeChart'
+import { Audit, UptimeCheck, Alert } from '@/types'
 
 export const metadata: Metadata = {
   title: 'Website Details - Website Monitor',
@@ -40,6 +41,21 @@ export default async function WebsiteDetailPage({
     .eq('website_id', id)
     .order('created_at', { ascending: false })
     .limit(10)
+
+  const { data: uptimeChecks } = await supabase
+    .from('uptime_checks')
+    .select('*')
+    .eq('website_id', id)
+    .order('checked_at', { ascending: false })
+    .limit(30)
+
+  const { data: activeAlerts } = await supabase
+    .from('alerts')
+    .select('*')
+    .eq('website_id', id)
+    .eq('is_read', false)
+    .order('created_at', { ascending: false })
+    .limit(5)
 
   const statusColors: Record<string, string> = {
     healthy: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -99,6 +115,14 @@ export default async function WebsiteDetailPage({
 
         {/* Audit Graphics & Analytics */}
         <AuditCharts audits={(audits as Audit[]) || []} />
+
+        {/* Uptime & Response Time Graphic (5-15 min intervals, scheduled 2 hours) */}
+        <UptimeChart
+          websiteId={website.id}
+          initialChecks={(uptimeChecks as UptimeCheck[]) || []}
+          initialAlerts={(activeAlerts as Alert[]) || []}
+          url={website.url}
+        />
 
         {/* Details list */}
         <div className="border-t border-slate-100 pt-6">
