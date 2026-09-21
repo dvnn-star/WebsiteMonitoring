@@ -37,12 +37,18 @@ export default async function WebsiteDetailPage({
     .select('*')
     .eq('website_id', id)
     .order('created_at', { ascending: false })
-    .limit(5)
+    .limit(10)
 
   const statusColors: Record<string, string> = {
     healthy: 'text-status-pass',
     warning: 'text-status-warning',
     critical: 'text-status-error',
+  }
+
+  const statusBgColors: Record<string, string> = {
+    healthy: 'bg-status-pass/10',
+    warning: 'bg-status-warning/10',
+    critical: 'bg-status-error/10',
   }
 
   return (
@@ -70,14 +76,18 @@ export default async function WebsiteDetailPage({
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="border border-border-light rounded-lg p-4">
-            <p className="text-sm text-text-secondary">Status</p>
-            <p className={`text-lg font-medium ${statusColors[website.last_audit_status || ''] || 'text-text-secondary'}`}>
-              {website.last_audit_status || 'Not audited'}
-            </p>
+            <p className="text-sm text-text-secondary mb-1">Status</p>
+            {website.last_audit_status ? (
+              <span className={`inline-block px-2 py-1 rounded text-sm font-medium ${statusBgColors[website.last_audit_status]} ${statusColors[website.last_audit_status]}`}>
+                {website.last_audit_status}
+              </span>
+            ) : (
+              <span className="text-text-secondary">Not audited</span>
+            )}
           </div>
           <div className="border border-border-light rounded-lg p-4">
-            <p className="text-sm text-text-secondary">Last Audit</p>
-            <p className="text-lg font-medium text-text-primary">
+            <p className="text-sm text-text-secondary mb-1">Last Audit</p>
+            <p className="text-text-primary font-medium">
               {website.last_audit_at
                 ? new Date(website.last_audit_at).toLocaleDateString()
                 : '-'}
@@ -103,29 +113,47 @@ export default async function WebsiteDetailPage({
 
         {audits && audits.length > 0 && (
           <div className="border-t border-border-light pt-6 mt-6">
-            <h2 className="text-lg font-medium text-text-primary mb-4">Recent Audits</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-text-primary">Audit History</h2>
+              <span className="text-sm text-text-secondary">{audits.length} audits</span>
+            </div>
             <div className="space-y-2">
               {audits.map((audit) => (
                 <Link
                   key={audit.id}
                   href={`/dashboard/websites/${website.id}/audit/${audit.id}`}
-                  className="flex items-center justify-between p-3 border border-border-light rounded-lg hover:bg-bg-secondary"
+                  className="flex items-center justify-between p-4 border border-border-light rounded-lg hover:bg-bg-secondary transition-colors"
                 >
-                  <div>
-                    <div className="text-sm font-medium text-text-primary">
-                      {new Date(audit.created_at).toLocaleDateString()} at{' '}
-                      {new Date(audit.created_at).toLocaleTimeString()}
-                    </div>
-                    <div className="text-xs text-text-secondary">
-                      {audit.pass_count} Pass, {audit.warning_count} Warning, {audit.error_count} Error
+                  <div className="flex items-center gap-4">
+                    <div className={`w-2 h-2 rounded-full ${audit.error_count > 0 ? 'bg-status-error' : audit.warning_count > 0 ? 'bg-status-warning' : 'bg-status-pass'}`}></div>
+                    <div>
+                      <div className="text-sm font-medium text-text-primary">
+                        {new Date(audit.created_at).toLocaleDateString()} at{' '}
+                        {new Date(audit.created_at).toLocaleTimeString()}
+                      </div>
+                      <div className="text-xs text-text-secondary mt-0.5">
+                        {audit.status === 'completed' ? 'Completed' : audit.status}
+                      </div>
                     </div>
                   </div>
-                  <span className={`text-sm ${statusColors[audit.status === 'completed' ? (audit.error_count > 0 ? 'critical' : audit.warning_count > 0 ? 'warning' : 'healthy') : '']}`}>
-                    {audit.status}
-                  </span>
+                  <div className="flex items-center gap-4 text-sm">
+                    <span className="text-status-pass">{audit.pass_count} Pass</span>
+                    <span className="text-status-warning">{audit.warning_count} Warning</span>
+                    <span className="text-status-error">{audit.error_count} Error</span>
+                    <svg className="w-4 h-4 text-text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </Link>
               ))}
             </div>
+          </div>
+        )}
+
+        {(!audits || audits.length === 0) && (
+          <div className="border-t border-border-light pt-6 mt-6 text-center py-8">
+            <p className="text-text-secondary mb-4">No audits yet. Run your first audit to see results.</p>
+            <RunAuditButton websiteId={website.id} />
           </div>
         )}
       </div>

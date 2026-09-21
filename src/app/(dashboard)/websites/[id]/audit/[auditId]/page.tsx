@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { AuditClient } from '@/components/audit/AuditClient'
+import { AuditResults } from '@/components/audit/AuditResults'
 
 export const metadata: Metadata = {
   title: 'Audit Results - Website Monitor',
@@ -44,6 +44,11 @@ export default async function AuditResultPage({
     notFound()
   }
 
+  const { data: results } = await supabase
+    .from('audit_results')
+    .select('*')
+    .eq('audit_id', auditId)
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <Link
@@ -61,9 +66,18 @@ export default async function AuditResultPage({
           {website.name || website.domain}
         </h1>
         <p className="text-text-secondary">{website.url}</p>
+        <p className="text-sm text-text-tertiary mt-1">
+          Audited on {new Date(audit.created_at).toLocaleDateString()} at{' '}
+          {new Date(audit.created_at).toLocaleTimeString()}
+        </p>
       </div>
 
-      <AuditClient auditId={auditId} />
+      <AuditResults
+        auditId={auditId}
+        websiteId={id}
+        initialStatus={audit.status}
+        initialResults={results || []}
+      />
     </div>
   )
 }
