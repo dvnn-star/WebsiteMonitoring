@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { RunAuditButton } from '@/components/websites/RunAuditButton'
+import { AuditCharts } from '@/components/websites/AuditCharts'
+import { Audit } from '@/types'
 
 export const metadata: Metadata = {
   title: 'Website Details - Website Monitor',
@@ -94,6 +96,9 @@ export default async function WebsiteDetailPage({
             </p>
           </div>
         </div>
+
+        {/* Audit Graphics & Analytics */}
+        <AuditCharts audits={(audits as Audit[]) || []} />
 
         {/* Details list */}
         <div className="border-t border-slate-100 pt-6">

@@ -110,6 +110,12 @@ CREATE POLICY "Users can view own audits" ON public.audits
 CREATE POLICY "Users can insert own audits" ON public.audits
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+CREATE POLICY "Users can update own audits" ON public.audits
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own audits" ON public.audits
+  FOR DELETE USING (auth.uid() = user_id);
+
 -- RLS Policies for audit_results
 CREATE POLICY "Users can view own audit results" ON public.audit_results
   FOR SELECT USING (
@@ -120,9 +126,45 @@ CREATE POLICY "Users can view own audit results" ON public.audit_results
     )
   );
 
+CREATE POLICY "Users can insert own audit results" ON public.audit_results
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.audits 
+      WHERE audits.id = audit_results.audit_id 
+      AND audits.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can update own audit results" ON public.audit_results
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM public.audits 
+      WHERE audits.id = audit_results.audit_id 
+      AND audits.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can delete own audit results" ON public.audit_results
+  FOR DELETE USING (
+    EXISTS (
+      SELECT 1 FROM public.audits 
+      WHERE audits.id = audit_results.audit_id 
+      AND audits.user_id = auth.uid()
+    )
+  );
+
 -- RLS Policies for links
 CREATE POLICY "Users can view own links" ON public.links
   FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.audits 
+      WHERE audits.id = links.audit_id 
+      AND audits.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can insert own links" ON public.links
+  FOR INSERT WITH CHECK (
     EXISTS (
       SELECT 1 FROM public.audits 
       WHERE audits.id = links.audit_id 

@@ -19,6 +19,7 @@ const config: Config = {
     'src/components/auth/RegisterForm.tsx',
     'src/components/websites/AddWebsiteForm.tsx',
     'src/components/websites/WebsiteCard.tsx',
+    'src/components/websites/AuditCharts.tsx',
     'src/components/audit/AuditSummary.tsx',
     'src/components/audit/CheckItem.tsx',
     'src/components/dashboard/DashboardStats.tsx',
