@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AuditResults } from '@/components/audit/AuditResults'
-import { ArrowLeft, Globe, Clock, ExternalLink } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Audit Results - Website Monitor',
@@ -51,42 +50,23 @@ export default async function AuditResultPage({
     .eq('audit_id', auditId)
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="w-full px-6 sm:px-10 lg:px-14 py-8">
       <Link
         href={`/dashboard/websites/${id}`}
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 mb-6 transition-colors"
+        className="inline-flex items-center text-xs font-medium text-slate-500 hover:text-slate-800 mb-6 transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Back to Website</span>
+        ← Back to Website
       </Link>
 
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-7 shadow-sm mb-6">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100 shadow-sm">
-            <Globe className="w-6 h-6" />
-          </div>
-          <div className="min-w-0">
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight truncate">
-              {website.name || website.domain}
-            </h1>
-            <a
-              href={website.url}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 hover:underline mt-1"
-            >
-              <span>{website.url}</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
-            <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-2">
-              <Clock className="w-3.5 h-3.5" />
-              <span>
-                Audited on {new Date(audit.created_at).toLocaleDateString()} at{' '}
-                {new Date(audit.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            </div>
-          </div>
-        </div>
+      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm mb-6">
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+          {website.name || website.domain}
+        </h1>
+        <p className="text-xs text-slate-500 mt-0.5">{website.url}</p>
+        <p className="text-xs text-slate-400 mt-2">
+          Audited on {new Date(audit.created_at).toLocaleDateString()} at{' '}
+          {new Date(audit.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </p>
       </div>
 
       <AuditResults

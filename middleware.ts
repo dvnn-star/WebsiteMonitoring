@@ -33,16 +33,30 @@ export async function middleware(request: NextRequest) {
   const isProtected = pathname.startsWith('/dashboard')
 
   if (!user && isProtected) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = '/login'
+    const redirectResponse = NextResponse.redirect(redirectUrl)
+    supabaseResponse.cookies.getAll().forEach(cookie => {
+      redirectResponse.cookies.set(cookie.name, cookie.value, cookie)
+    })
+    return redirectResponse
   }
 
   if (user && isAuthRoute) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = '/dashboard'
+    const redirectResponse = NextResponse.redirect(redirectUrl)
+    supabaseResponse.cookies.getAll().forEach(cookie => {
+      redirectResponse.cookies.set(cookie.name, cookie.value, cookie)
+    })
+    return redirectResponse
   }
 
   return supabaseResponse
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/register'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }

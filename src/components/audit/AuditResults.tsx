@@ -7,7 +7,6 @@ import { AuditProgress } from '@/components/audit/AuditProgress'
 import { AuditSummary } from '@/components/audit/AuditSummary'
 import { CategoryCard } from '@/components/audit/CategoryCard'
 import { IssueDetail } from '@/components/audit/IssueDetail'
-import { RotateCw, Loader2 } from 'lucide-react'
 
 const categoryOrder = ['technical', 'seo', 'crawlability', 'performance', 'security', 'infrastructure']
 
@@ -80,7 +79,7 @@ export function AuditResults({
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="mb-6">
         <AuditSummary
           audit={{
             id: auditId,
@@ -97,28 +96,18 @@ export function AuditResults({
 
       <div className="flex items-center justify-between mb-4">
         <p className="text-xs text-slate-500">
-          Click on any check to view technical details and optimization recommendations.
+          Click any item to view technical details and recommendations.
         </p>
         <button
           onClick={handleRerunAudit}
           disabled={isRerunning}
-          className="inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-blue-700 shadow-sm transition-all disabled:opacity-50 shrink-0"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 shrink-0"
         >
-          {isRerunning ? (
-            <>
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              <span>Starting...</span>
-            </>
-          ) : (
-            <>
-              <RotateCw className="w-3.5 h-3.5" />
-              <span>Run Audit Again</span>
-            </>
-          )}
+          {isRerunning ? 'Starting...' : 'Run Audit Again'}
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {categoryOrder.map((category) => (
           groupedResults[category].length > 0 && (
             <CategoryCard

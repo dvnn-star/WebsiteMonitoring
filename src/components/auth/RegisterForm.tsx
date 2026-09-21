@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { AlertCircle, UserPlus } from 'lucide-react'
 
 export function RegisterForm() {
   const router = useRouter()
@@ -48,6 +47,7 @@ export function RegisterForm() {
         return
       }
 
+      router.refresh?.()
       router.push('/dashboard')
     } catch {
       setError('An unexpected error occurred')
@@ -92,30 +92,22 @@ export function RegisterForm() {
       />
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium rounded-lg">
-          <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
-          <span>{error}</span>
+        <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium rounded-lg">
+          {error}
         </div>
       )}
 
       <Button
         type="submit"
-        className="w-full shadow-sm"
+        className="w-full"
         disabled={loading}
       >
-        {loading ? (
-          'Creating account...'
-        ) : (
-          <span className="inline-flex items-center gap-2">
-            <UserPlus className="w-4 h-4" />
-            Register
-          </span>
-        )}
+        {loading ? 'Creating account...' : 'Register'}
       </Button>
 
       <p className="text-center text-xs text-slate-500 pt-1">
         Already have an account?{' '}
-        <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-700 hover:underline">
+        <Link href="/login" className="font-semibold text-blue-600 hover:underline">
           Login
         </Link>
       </p>

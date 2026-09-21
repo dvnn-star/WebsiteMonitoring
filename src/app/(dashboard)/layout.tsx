@@ -17,9 +17,9 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <div className="min-h-screen w-full bg-slate-50 flex flex-col">
+      <header className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur border-b border-slate-200">
+        <div className="w-full px-6 sm:px-10 lg:px-14 h-16 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/dashboard" className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm">
@@ -47,7 +47,7 @@ export default async function DashboardLayout({
           <UserMenu email={user.email || ''} />
         </div>
       </header>
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 w-full">{children}</main>
     </div>
   )
 }
