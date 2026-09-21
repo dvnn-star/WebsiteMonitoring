@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Swal from 'sweetalert2'
 import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -47,8 +48,15 @@ export function RegisterForm() {
         return
       }
 
-      router.refresh?.()
-      router.push('/dashboard')
+      await Swal.fire({
+        title: 'Registrasi Berhasil!',
+        text: 'Silakan cek email Anda untuk mengkonfirmasi akun sebelum melanjutkan.',
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#2563eb',
+      })
+
+      router.push('/login')
     } catch {
       setError('An unexpected error occurred')
     } finally {

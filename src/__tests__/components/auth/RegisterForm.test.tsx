@@ -14,6 +14,10 @@ jest.mock('@/lib/supabase/client', () => ({
   },
 }))
 
+jest.mock('sweetalert2', () => ({
+  fire: jest.fn().mockResolvedValue({}),
+}))
+
 beforeEach(() => {
   mockPush.mockReset()
   mockSignUp.mockReset()
@@ -68,7 +72,7 @@ describe('RegisterForm', () => {
     })
   })
 
-  it('redirects to dashboard on success', async () => {
+  it('redirects to login on success', async () => {
     mockSignUp.mockResolvedValueOnce({ error: null })
 
     render(<RegisterForm />)
@@ -78,7 +82,7 @@ describe('RegisterForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /register/i }))
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/dashboard')
+      expect(mockPush).toHaveBeenCalledWith('/login')
     })
   })
 })
