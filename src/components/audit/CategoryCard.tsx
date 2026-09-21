@@ -8,15 +8,6 @@ interface CategoryCardProps {
   results: AuditResult[]
 }
 
-const categoryTitles: Record<string, string> = {
-  technical: 'Technical',
-  seo: 'SEO',
-  crawlability: 'Crawlability',
-  performance: 'Performance',
-  security: 'Security',
-  infrastructure: 'Infrastructure',
-}
-
 export function CategoryCard({ title, results }: CategoryCardProps) {
   if (results.length === 0) return null
 

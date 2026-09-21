@@ -1,12 +1,5 @@
 import { AuditResult } from '@/types'
 
-interface HTTPCheckResult {
-  status: number
-  finalUrl: string
-  responseTime: number
-  redirected: boolean
-}
-
 export async function checkHTTPStatus(url: string): Promise<AuditResult[]> {
   const results: AuditResult[] = []
   const startTime = Date.now()

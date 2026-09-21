@@ -1,13 +1,5 @@
 import { AuditResult } from '@/types'
 
-interface SSLInfo {
-  valid: boolean
-  issuer?: string
-  validFrom?: string
-  validTo?: string
-  daysRemaining?: number
-}
-
 export async function checkSSL(url: string): Promise<AuditResult[]> {
   const results: AuditResult[] = []
   const urlObj = new URL(url)
@@ -37,7 +29,7 @@ export async function checkSSL(url: string): Promise<AuditResult[]> {
   })
 
   try {
-    const response = await fetch(url, {
+    await fetch(url, {
       method: 'HEAD',
       signal: AbortSignal.timeout(10000),
     })

@@ -27,7 +27,7 @@ export function RunAuditButton({ websiteId }: RunAuditButtonProps) {
       } else {
         alert(data.error || 'Failed to start audit')
       }
-    } catch (error) {
+    } catch {
       alert('Failed to start audit')
     } finally {
       setLoading(false)
