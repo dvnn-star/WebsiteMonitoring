@@ -68,7 +68,7 @@ export async function POST(request: Request) {
   const { data: audit, error: auditError } = await supabase
     .from('audits')
     .insert({ website_id, user_id: user.id, status: 'queued' })
-    .select('id, website_id, status, created_at, overall_score')
+    .select('id, website_id, status, created_at, pass_count, warning_count, error_count')
     .single()
 
   if (auditError) {
