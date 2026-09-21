@@ -41,7 +41,7 @@ export interface Audit {
 }
 
 export interface AuditResult {
-  id: string
+  id?: string
   audit_id: string
   category: Category
   check_type: string
@@ -51,7 +51,7 @@ export interface AuditResult {
   message?: string
   technical_details?: Record<string, unknown>
   recommendation?: string
-  created_at: string
+  created_at?: string
 }
 
 // API Types

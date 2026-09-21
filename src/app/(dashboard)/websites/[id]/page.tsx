@@ -1,7 +1,8 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { RunAuditButton } from '@/components/websites/RunAuditButton'
 
 export const metadata: Metadata = {
   title: 'Website Details - Website Monitor',
@@ -16,7 +17,7 @@ export default async function WebsiteDetailPage({
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    notFound()
+    redirect('/login')
   }
 
   const { id } = await params
@@ -29,6 +30,19 @@ export default async function WebsiteDetailPage({
 
   if (!website) {
     notFound()
+  }
+
+  const { data: audits } = await supabase
+    .from('audits')
+    .select('*')
+    .eq('website_id', id)
+    .order('created_at', { ascending: false })
+    .limit(5)
+
+  const statusColors: Record<string, string> = {
+    healthy: 'text-status-pass',
+    warning: 'text-status-warning',
+    critical: 'text-status-error',
   }
 
   return (
@@ -51,18 +65,13 @@ export default async function WebsiteDetailPage({
             </h1>
             <p className="text-text-secondary mt-1">{website.url}</p>
           </div>
-          <Link
-            href={`/dashboard/websites/${website.id}/run-audit`}
-            className="bg-accent text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
-          >
-            Run Audit
-          </Link>
+          <RunAuditButton websiteId={website.id} />
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="border border-border-light rounded-lg p-4">
             <p className="text-sm text-text-secondary">Status</p>
-            <p className="text-lg font-medium text-text-primary">
+            <p className={`text-lg font-medium ${statusColors[website.last_audit_status || ''] || 'text-text-secondary'}`}>
               {website.last_audit_status || 'Not audited'}
             </p>
           </div>
@@ -91,6 +100,34 @@ export default async function WebsiteDetailPage({
             </div>
           </dl>
         </div>
+
+        {audits && audits.length > 0 && (
+          <div className="border-t border-border-light pt-6 mt-6">
+            <h2 className="text-lg font-medium text-text-primary mb-4">Recent Audits</h2>
+            <div className="space-y-2">
+              {audits.map((audit) => (
+                <Link
+                  key={audit.id}
+                  href={`/dashboard/websites/${website.id}/audit/${audit.id}`}
+                  className="flex items-center justify-between p-3 border border-border-light rounded-lg hover:bg-bg-secondary"
+                >
+                  <div>
+                    <div className="text-sm font-medium text-text-primary">
+                      {new Date(audit.created_at).toLocaleDateString()} at{' '}
+                      {new Date(audit.created_at).toLocaleTimeString()}
+                    </div>
+                    <div className="text-xs text-text-secondary">
+                      {audit.pass_count} Pass, {audit.warning_count} Warning, {audit.error_count} Error
+                    </div>
+                  </div>
+                  <span className={`text-sm ${statusColors[audit.status === 'completed' ? (audit.error_count > 0 ? 'critical' : audit.warning_count > 0 ? 'warning' : 'healthy') : '']}`}>
+                    {audit.status}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
